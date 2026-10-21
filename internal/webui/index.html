@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="figmobil-token" content="__FIGMOBIL_TOKEN__">
+  <title>figmobil · Сравнение локальных копий</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script type="module" src="/app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Перейти к сравнению</a>
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="figmobil, начальная страница"><span class="brand-mark" aria-hidden="true">f</span>figmobil<span class="version">LOCAL COMPARE</span></a>
+    <span class="local-badge"><span aria-hidden="true">●</span> Локально · только чтение</span>
+  </header>
+  <main id="main" class="workspace">
+    <div class="page-heading">
+      <p class="eyebrow">РАБОЧИЕ КОПИИ</p>
+      <h1>Сравнение локальных копий</h1>
+      <p class="intro">Проверьте различия между двумя папками проекта. figmobil читает файлы и показывает отчёт, сохраняя обе копии без изменений.</p>
+    </div>
+    <section class="panel setup-panel" aria-labelledby="setup-heading">
+      <div class="section-heading"><span class="step" aria-hidden="true">01</span><div><h2 id="setup-heading">Выберите папки</h2><p>Сравнение начнётся только по кнопке.</p></div></div>
+      <form id="compare-form">
+        <fieldset id="roots-fields">
+          <legend class="sr-only">Пути к локальным папкам</legend>
+          <div class="root-grid">
+            <div class="field"><label for="local-root">Рабочая копия <span class="label-tag">Локальная</span></label><input id="local-root" name="localRoot" type="text" placeholder="C:\Projects\my-project" spellcheck="false" autocomplete="off" required aria-describedby="root-hint"><p>Копия, с которой вы сейчас работаете.</p></div>
+            <div class="field"><label for="incoming-root">Вторая копия <span class="label-tag">Входящая</span></label><input id="incoming-root" name="incomingRoot" type="text" placeholder="D:\Copies\my-project" spellcheck="false" autocomplete="off" required aria-describedby="root-hint"><p>Другая локальная папка для сравнения.</p></div>
+          </div>
+          <p class="input-hint" id="root-hint">Вставьте полный путь к папке из адресной строки Проводника. Обе папки должны находиться на этом компьютере.</p>
+          <div class="base-section">
+            <label class="checkbox-label" for="has-base"><input id="has-base" type="checkbox"><span>Есть общая базовая копия</span></label>
+            <p>База помогает отличить изменения каждой стороны от конфликтов.</p>
+            <div class="field base-field" id="base-field" hidden><label for="base-root">Общая база</label><input id="base-root" name="baseRoot" type="text" placeholder="D:\Copies\my-project-base" spellcheck="false" autocomplete="off" aria-describedby="base-hint"><p id="base-hint">Отдельная папка с общей версией обеих копий до изменений.</p></div>
+          </div>
+        </fieldset>
+        <div class="form-footer"><div class="button-group"><button class="button primary" type="submit" id="compare-button">Сравнить копии <span aria-hidden="true">→</span></button><button class="button secondary" type="button" id="cancel-button" hidden>Отменить</button></div><span class="privacy-note">Файлы остаются на этом компьютере</span></div>
+      </form>
+    </section>
+    <div id="activity" class="activity" role="status" aria-live="polite" aria-atomic="true">Готово к сравнению. Укажите пути к двум папкам.</div>
+    <section id="error-panel" class="notice error-notice" role="alert" hidden><h2 id="error-heading" tabindex="-1">Не удалось сравнить копии</h2><p id="error-message"></p><p id="error-code" class="error-code"></p></section>
+    <section id="empty-panel" class="empty-panel" aria-labelledby="empty-heading"><span class="empty-symbol" aria-hidden="true">⇄</span><h2 id="empty-heading">Здесь появятся различия</h2><p>Отчёт покажет изменённые файлы, конфликты и особенности формата: переводы строк, кодировку и BOM.</p><div class="empty-tags"><span>Без записи файлов</span><span>Без подключения к Figma</span><span>Без фонового наблюдения</span></div></section>
+    <section id="report-panel" class="panel report-panel" aria-labelledby="report-heading" hidden>
+      <div class="report-heading"><div class="section-heading"><span class="step" aria-hidden="true">02</span><div><h2 id="report-heading" tabindex="-1">Результат сравнения</h2><p id="report-description"></p></div></div><span class="report-state" id="report-state"></span></div>
+      <div class="notice incomplete-notice" id="incomplete-notice" hidden>Отчёт неполный. Отсутствие файла в отчёте не подтверждает, что он совпадает или отсутствует.</div>
+      <div class="summary-grid" id="summary-grid" aria-label="Количество файлов по состоянию"></div>
+      <div class="warnings" id="warnings" hidden><h3>Требует внимания</h3><ul id="warning-list"></ul></div>
+      <div class="report-tools"><div class="search-field"><label for="path-search">Поиск по пути</label><input id="path-search" type="search" placeholder="Например, src/components" autocomplete="off" spellcheck="false"></div><div class="status-filter"><label for="status-filter">Состояние</label><select id="status-filter"><option value="all">Все файлы</option><option value="changed">Только различия</option><option value="attention">Требуют внимания</option></select></div></div>
+      <div class="table-container"><table><caption class="sr-only">Файлы в сравнении. Разверните строку, чтобы посмотреть метаданные.</caption><thead><tr><th scope="col">Файл</th><th scope="col">Состояние</th><th scope="col">Локальная</th><th scope="col">Входящая</th><th scope="col"><span class="sr-only">Подробности</span></th></tr></thead><tbody id="file-rows"></tbody></table></div>
+      <p id="no-matches" class="no-matches" hidden>По заданным условиям файлы не найдены.</p>
+      <nav class="pagination" aria-label="Страницы отчёта"><p id="result-count"></p><div class="button-group"><button class="button small secondary" id="previous-page" type="button">← Назад</button><span id="page-count"></span><button class="button small secondary" id="next-page" type="button">Далее →</button></div></nav>
+      <p class="report-footnote">Отсутствие файла во входящей копии не является командой удаления. Сравнение не применяет изменения и не меняет состояние Git.</p>
+    </section>
+    <footer class="page-footer"><span>figmobil · локальное сравнение</span><span>Импорт, экспорт и передача через Figma пока не реализованы.</span></footer>
+  </main>
+  <noscript><p class="notice">Для локального интерфейса требуется JavaScript. Файлы не изменялись.</p></noscript>
+</body>
+</html>

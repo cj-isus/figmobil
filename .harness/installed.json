@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "profile": "core",
+  "agentsBlockHash": "068744368a18b217d5a7e4e3fd6e9f719ae3d147bc62668307c15e277268af8a",
+  "files": {
+    "scripts/harness/map.mjs": "19709fda9bdbc7c63a3f5f65d63cf48995cd778342fbb8d9c3299ba81536116e",
+    "scripts/harness/doctor.mjs": "0b260af977f32c7bcadcf0f90fd7b505f1dd0b73739473c22fd759a01a1ab2f8",
+    "scripts/harness/eval.mjs": "cf12028a336fe45852708c59806da895b92925c489b167508c8574fab2230e6b",
+    "scripts/harness/project-memory.mjs": "09b6b2171f9e296fc09370f128fc63a54a8c68180965a3b500184775e3e98f6f",
+    "scripts/harness/verify-skills.mjs": "03ec25f20698f093d3c6e9c37641f80deff7ae058eb9e289d81236e5db40fb41",
+    "docs/HARNESS.md": "db1d09997a584d5a6829a9506e21ef1f1f319df23cbc85628bf55fd1e13e76ef",
+    "docs/MEMORY.md": "a8861c8a0bbc30cf1fa27668f639f84bc5fc002fd1654e20781b821276534613",
+    "docs/SKILLS-CATALOG.md": "3579b08ef6645e947cd024eafc64e23a53b88126774750fbe29e462e50d9b76e",
+    "docs/ONBOARDING.md": "937325d3db9029ae390b19f37f05f02a84f27894e44dbdc8a41783f82a380e59",
+    "docs/STATE.md": "4a4cb690dfc7f5fae27dfd5105f21d6fb76c0cf066235f8cff8366443f45d596",
+    "docs/LESSONS.md": "f247a0745ba1a524084e239b71d2b65c48877fa75d3db010c3a8e5bc9f34f7f8",
+    ".agents/skills/repo-recon/SKILL.md": "2a8ee98685ae71782a66696a10aae2b1ed57ba9fa843e594b34fd476b7092d17",
+    ".agents/skills/memory-loop/SKILL.md": "097314d0a60a156e9d3377081be127c0777756733fed2e13fa549bdaea61ff1a",
+    ".agents/skills/frontend-postgres/SKILL.md": "8f4fce4a1c89fc774b0d80e84a52190b9151bc2dd62a53996318bc28275f08f4",
+    ".agents/skills/project-memory/SKILL.md": "f4cbf7e64b5bf0fbcc0ef0ee1cfce7c8062d0fd72bdabc618286cbb946acfd4e",
+    "AGENTS.md": "d5a6d511439f4e2c0cdb10d636aaeb8cd11d7a9af6ce1168e0c915f2331963ae"
+  }
+}

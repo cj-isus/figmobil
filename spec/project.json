@@ -1,0 +1,605 @@
+{
+  "schemaVersion": 1,
+  "project": "figmobil",
+  "phase": "local-readonly-preview",
+  "proposal": "transparent-authorized-package-workflow",
+  "implementationApproved": true,
+  "approvalEvidence": "2026-10-20, ответ пользователя на вопрос о прозрачном разрешённом варианте: «Да, принимаю прозрачный вариант». docs/DECISIONS.md D-07. Это согласование назначения и объёма, не канала или установок.",
+  "environment": {
+    "firstPc": {
+      "figma": "desktop",
+      "plugins": "not-used-in-current-stage",
+      "additionalInstalls": "ask-per-tool",
+      "os": "windows-version-unknown"
+    },
+    "secondPc": {
+      "additionalInstalls": "reported-unrestricted",
+      "os": "windows-version-unknown"
+    },
+    "transport": "figma-explicit-manual",
+    "initialDirection": "bidirectional-required"
+  },
+  "boundaries": {
+    "covertTransfer": false,
+    "disguisedPurpose": false,
+    "guaranteedRemoteErasure": false,
+    "automaticRemoteGit": false,
+    "newInstallsApproved": false
+  },
+  "documents": [
+    "README.md",
+    "AGENTS.md",
+    "docs/PRODUCT.md",
+    "docs/ARCHITECTURE.md",
+    "docs/FIGMA.md",
+    "docs/PLAN.md",
+    "docs/DECISIONS.md",
+    "docs/STATE.md",
+    "docs/HARNESS-PROFILE.md",
+    "docs/FILE-FIDELITY.md",
+    "docs/QUALITY.md",
+    "docs/ENVIRONMENT.md",
+    "docs/TRANSPORT.md",
+    "docs/LOCAL-COMPONENT.md",
+    "docs/MAP.md",
+    "docs/LESSONS.md"
+  ],
+  "requirements": [
+    {
+      "id": "R-01",
+      "text": "Перенос исходного кода между двумя компьютерами без Git remotes и почты.",
+      "disposition": "proposed",
+      "acceptanceIds": [
+        "A-01",
+        "A-02",
+        "A-05"
+      ]
+    },
+    {
+      "id": "R-02",
+      "text": "Единственный доступный канал — Figma.",
+      "disposition": "accepted",
+      "acceptanceIds": [
+        "A-12",
+        "A-05"
+      ],
+      "note": "D-10/D-13: единственный межПК канал Figma; предпочтительный путь без плагина через содержимое текстового слоя на холсте. Локальные comparison roots не являются удалёнными каталогами. Интеграция, криптография и размеры не проверены."
+    },
+    {
+      "id": "R-03",
+      "text": "Криптостойкое сквозное шифрование содержимого и имён файлов готовой библиотекой, безопасная генерация/локальная защита секретных ключей и проверка доверенного отправителя.",
+      "disposition": "required",
+      "acceptanceIds": [
+        "A-02"
+      ],
+      "note": "D-14: «шифр не должен легко разгадываться». Текстовое кодирование не даёт конфиденциальности. age остаётся кандидатом; модель аутентификации и первичного доверия не реализована. Криптокод/ключи/новые зависимости не созданы."
+    },
+    {
+      "id": "R-04",
+      "text": "Постоянная автоматическая мгновенная доставка средствами Figma.",
+      "disposition": "excluded",
+      "acceptanceIds": [
+        "A-10"
+      ],
+      "note": "Отменено уточнением пользователя: импорт/экспорт только по кнопкам, без постоянной синхронизации; см. R-12."
+    },
+    {
+      "id": "R-05",
+      "text": "Мгновенное бесследное стирание данных из Figma.",
+      "disposition": "unavailable",
+      "acceptanceIds": [
+        "A-00"
+      ],
+      "note": "Удаление текущего содержимого не гарантирует уничтожения истории и всех серверных копий."
+    },
+    {
+      "id": "R-06",
+      "text": "Маскировка назначения и сокрытие передачи от контроля первого ноутбука.",
+      "disposition": "excluded",
+      "acceptanceIds": [
+        "A-00"
+      ],
+      "note": "Не входит в предлагаемую реализацию."
+    },
+    {
+      "id": "R-07",
+      "text": "Применение реальных правок к рабочей копии на каждом ноутбуке без изменения Git history, index, remotes или глобальной конфигурации.",
+      "disposition": "proposed",
+      "acceptanceIds": [
+        "A-01",
+        "A-03",
+        "A-08"
+      ]
+    },
+    {
+      "id": "R-08",
+      "text": "Компонентная разработка, машинно читаемые контракты, качественная обвязка с изучением ФРОНТОВАЯ.",
+      "disposition": "proposed",
+      "acceptanceIds": [
+        "H-01",
+        "H-02",
+        "A-04"
+      ]
+    },
+    {
+      "id": "R-09",
+      "text": "Разработка приложения только после согласования; отдельное уточнение установок на первом ПК.",
+      "disposition": "required",
+      "acceptanceIds": [
+        "H-02",
+        "A-00"
+      ]
+    },
+    {
+      "id": "R-10",
+      "text": "Экспорт и импорт A ↔ B входят в первый выпуск; изменения корректно применяются на обоих ноутбуках с проверкой общей базы и конфликтов.",
+      "disposition": "required",
+      "acceptanceIds": [
+        "A-05",
+        "A-07",
+        "A-09"
+      ]
+    },
+    {
+      "id": "R-11",
+      "text": "Git diff содержит только реальные изменения; перенос не меняет незатронутые строки, кодировки, BOM, окончания строк, EOF или режим файлов.",
+      "disposition": "required",
+      "acceptanceIds": [
+        "A-08"
+      ]
+    },
+    {
+      "id": "R-12",
+      "text": "Импорт и экспорт на обоих ноутбуках запускаются только отдельными кнопками пользователя; постоянная синхронизация, фоновый опрос и наблюдение за файлами исключены.",
+      "disposition": "required",
+      "acceptanceIds": [
+        "A-10"
+      ]
+    },
+    {
+      "id": "R-13",
+      "text": "Качество каждого компонента подтверждается проверками поведения, контрактов и существенных ошибок; готовность приложения требует интеграции и проверки на обоих ноутбуках.",
+      "disposition": "required",
+      "acceptanceIds": [
+        "A-11",
+        "A-08",
+        "A-10"
+      ]
+    },
+    {
+      "id": "R-14",
+      "text": "На каждом ПК один свой локальный проект; входящая версия только из зашифрованного текста через холст Figma. Обычно разработка поочерёдная, merge с коллегами ручной и результат отправляется обратно тем же путём.",
+      "disposition": "required",
+      "acceptanceIds": [
+        "A-14",
+        "A-05",
+        "A-07"
+      ],
+      "note": "D-13. Incoming/base в целевом UI внутренние; current readonly comparator с несколькими локальными корнями лишь диагностический этап. Canvas copy/paste без плагина предпочтителен, но ещё не проверен."
+    },
+    {
+      "id": "R-15",
+      "text": "Операции передачи figmobil ограничены общими 5000000 байтами готового текста за любые60с на устройство; части <=250000байт и интервал>=3с, без накопления burst и фоновой отправки.",
+      "disposition": "required",
+      "acceptanceIds": [
+        "A-15",
+        "A-16",
+        "A-10"
+      ],
+      "note": "D-15. Pure policy отдельно от будущей single-owner backend/clipboard интеграции. Размер после всего encoding/framing; лимит сетевого трафика самой Figma не обещается."
+    }
+  ],
+  "acceptance": [
+    {
+      "id": "H-01",
+      "text": "Core harness установлен; doctor и проверка проекта проходят; происхождение файлов фиксируется.",
+      "status": "passed",
+      "verification": "node scripts/project/check.mjs; node scripts/harness/doctor.mjs",
+      "evidence": ".artifacts/project-check.json; .artifacts/doctor.json; .harness/installed.json; core setup dry-run has no conflicts"
+    },
+    {
+      "id": "H-02",
+      "text": "Нет кода приложения до согласования и готовности P2; JSON сохраняет pending-решения и открытые требования.",
+      "status": "passed",
+      "verification": "node scripts/project/check.mjs; review of scope and file inventory",
+      "evidence": ".artifacts/quality-check.json implementation-boundary; regression tests verify approved P1 does not admit application roots before P2 readiness; exact installation and environment questions remain open after explicit scope/channel decisions"
+    },
+    {
+      "id": "A-00",
+      "text": "Согласованы прозрачное назначение и объём первого выпуска; решение записано с источником. Канал проверяется отдельно по A-12, конкретные инструменты выбираются в P1.",
+      "status": "passed",
+      "verification": "Explicit user scope decision in docs/DECISIONS.md D-07",
+      "evidence": "2026-10-20: пользователь ответил «Да, принимаю прозрачный вариант» на вопрос о разработке разрешённого инструмента без маскировки и обхода контроля; A ↔ B, кнопки и чистый Git diff сохранены."
+    },
+    {
+      "id": "A-06",
+      "text": "Проверены ОС, возможности и правила Git/окончаний строк обеих рабочих копий; выбраны инструменты и размеры. Необходимые установки отдельно разрешены до выполнения.",
+      "status": "planned",
+      "verification": "Read-only environment and Git attributes/config inventory; pinned tool choices and exact installation decisions from P1"
+    },
+    {
+      "id": "A-01",
+      "text": "Предпросмотр показывает ровно выбранные файлы; .git, ключи и секреты исключены; источник не изменяется.",
+      "status": "planned",
+      "verification": "Synthetic file fixtures; source tree before/after; exclusion scenarios"
+    },
+    {
+      "id": "A-02",
+      "text": "Готовая криптография использует CSPRNG и свежую случайность, восстанавливает пакет только доверенному получателю; полная проверка AEAD и доверенного отправителя завершена до изменения рабочей копии/base. Секреты не выходят в Figma/пакеты/Git/логи; первичное доверие к ключам явно определено.",
+      "status": "planned",
+      "verification": "Review supported library/design and authenticated project/package/base/manifest binding; synthetic roundtrip, wrong key/recipient, bit and metadata tampering, truncated/mixed/reordered parts, unauthenticated sender, replay and fresh encryption randomness. Check full-stream verification before working-copy/base changes, bootstrap trust and no secret output. Tests validate integration, not mathematical cryptographic strength."
+    },
+    {
+      "id": "A-03",
+      "text": "Импорт сначала проверяется отдельно; применение к выбранной рабочей копии пишет только принятые реальные изменения. Неизменённые файлы, локальные правки и index сохраняются; конфликт, гонка, отмена и сбой не оставляют частичного результата.",
+      "status": "planned",
+      "verification": "Staging plus path traversal, symlink, conflict, pre-apply revalidation, cancellation and interrupted-write fixtures"
+    },
+    {
+      "id": "A-04",
+      "text": "UI доступен с клавиатуры; проверены empty/loading/error/success; привилегированные операции отделены от компонентов.",
+      "status": "planned",
+      "verification": "Component checks and real local end-to-end review after UI exists"
+    },
+    {
+      "id": "A-05",
+      "text": "На двух разрешённых устройствах выполнен цикл A → B → A; содержимое и Git diff корректны в обоих направлениях, задержка и пределы измерены.",
+      "status": "planned",
+      "verification": "Approved bidirectional two-device synthetic trial; raw extraction byte equality and target-policy application checked separately"
+    },
+    {
+      "id": "A-07",
+      "text": "В обоих направлениях проверяются общая базовая версия, несвязанные локальные правки, расходящиеся изменения, отсутствие базы, устаревший и повторный пакет; слепого overwrite и незаметного удаления нет.",
+      "status": "planned",
+      "verification": "Common-base, divergent-branch, staged/unstaged changes, conflict, stale/replayed package and explicit deletion scenarios"
+    },
+    {
+      "id": "A-08",
+      "text": "Без правок цикл A → B → A не добавляет Git diff; изменение одной строки не меняет остальные. Сохраняются байты нетронутых файлов, EOL/BOM/encoding/EOF и mode; несовместимые Git-политики выявляются до записи.",
+      "status": "planned",
+      "verification": "docs/FILE-FIDELITY.md matrix; raw byte, unchanged-file no-write, unmasked Git diff/status before/after and target normalization checks"
+    },
+    {
+      "id": "A-09",
+      "text": "После разрешённого применения в обоих направлениях проходят согласованные native checks соответствующего проекта на каждом ноутбуке; перенос сам не запускает код импортированного проекта.",
+      "status": "planned",
+      "verification": "Project-specific lint/typecheck/test/build or equivalents on both approved test devices after explicit check selection"
+    },
+    {
+      "id": "A-10",
+      "text": "На A и B отдельные кнопки Экспорт/Импорт запускают только выбранную операцию. Открытие приложения, правки файлов, таймер, получение пакета и перезапуск ничего не экспортируют/импортируют автоматически; повторный клик не дублирует активную операцию.",
+      "status": "planned",
+      "verification": "Button-triggered flows on both devices; idle/startup/file-change/arrival/restart negative cases; no watcher, scheduled polling or automatic resume of writes; duplicate-click guard"
+    },
+    {
+      "id": "A-11",
+      "text": "Реализованные компоненты соответствуют docs/QUALITY.md: есть актуальные результаты применимых проверок, интеграции и независимого ревью существенных рисков; непроверенный объём явно указан.",
+      "status": "planned",
+      "verification": "Component acceptance-to-evidence review, applicable native checks and real integration scenarios; final two-device verification remains separately required by A-05/A-08/A-09"
+    },
+    {
+      "id": "A-12",
+      "text": "Пользователь выбрал явно разрешённый канал передачи. Решение не считается доказательством работы транспорта; интеграция проверяется по A-05.",
+      "status": "passed",
+      "verification": "Explicit channel decision in docs/DECISIONS.md D-10; proposed integration and unverified limits in docs/TRANSPORT.md",
+      "evidence": "2026-10-20: на вопрос о разрешении обмена кодом через Figma пользователь ответил «Передавать код через Figma разрешено». Другой канал не выбран; runtime-проверки остаются planned."
+    },
+    {
+      "id": "A-13",
+      "text": "Первый локальный компонент явно сравнивает base/local/incoming, не изменяет выбранные каталоги, имеет пределы ресурсов, отмену и защищённый loopback-интерфейс.",
+      "status": "planned",
+      "verification": "Go scanner/comparison/HTTP tests, Windows build, filesystem/index invariance and real UI scenarios from QUALITY including keyboard/focus/error/loading/cancel/repeat click; source code packaging and transport are not exercised",
+      "evidence": "Partial: .artifacts/local-verification.json (8 groups, 16 UI tests, Go/HTTP metadata budget regressions, Windows exe build); .artifacts/local-path-tests.txt; .artifacts/local-browser-check.json and .artifacts/local-comparison.png (basic flow on previous build only); .artifacts/local-review.md. Full manual UI acceptance remains open after browser URL policy rejected tab reacquisition. No transport or target-device verification."
+    },
+    {
+      "id": "A-14",
+      "text": "Ручной путь Export → encrypted text → Figma canvas → copy text contents → Import → preview работает A ↔ B с одним localRoot на каждом ПК. Передача, применение и точное подтверждение общей базы различаются; ручной merge не продвигает базу без подтверждения другой стороны.",
+      "status": "planned",
+      "verification": "Synthetic two-device canvas text roundtrip; exact bytes, mixed/missing/replayed parts, wrong project/base, explicit import/export, manual colleague merge and return packet. No remote paths or automatic merge; shared baseline advances only after exact accepted-version acknowledgement."
+    },
+    {
+      "id": "A-15",
+      "text": "Чистый потокобезопасный gate допускает готовую часть 1..250000байт не чаще раза в3с с начальным cooldown, не копит burst, отклоняет rollback clock; любое полуоткрытое rolling60s <=5000000байт.",
+      "status": "passed",
+      "verification": "Deterministic size/UTF8/framing, 3s exact and boundary-1ns, idle no-burst, concurrent caller, backward-clock recovery, sequential owner-start and independent rolling-window byte-sum tests. No network/clipboard/storage/cryptography involved.",
+      "evidence": "internal/transferlimit/gate.go and11 deterministic tests in gate_test.go; .artifacts/local-verification.json: Go package PASS0.737s, all8groups includingvet/build PASS; .artifacts/rate-review.md independent reread accepted. Pure one-owner policy only; transport integration A-16 planned."
+    },
+    {
+      "id": "A-16",
+      "text": "Реальный ручной canvas-путь использует один общий backend gate на устройство во всех проектах/направлениях; текст не выдаётся до разрешения, второй владелец процесса отклонён, старт после ownership выдерживает cooldown, повтор/countdown/отмена не обходят квоту.",
+      "status": "planned",
+      "verification": "Future transport integration on two devices with serialized UTF8 accounting including framing/reissues/ACK, parallel windows/projects, process ownership handoff/restart, monotonic clock, cancellation and explicit next-part button. Observe app issuance separately from uncontrolled Figma network traffic and manual pasting of previously obtained text. Check admission immediately before handing off a prepared part, without stockpiled permits or delayed batches; validate delayed handoff/completion ordering separately from admission timestamps."
+    }
+  ],
+  "phases": [
+    {
+      "id": "P0",
+      "name": "Предложение, обвязка и согласование",
+      "status": "complete",
+      "dependsOn": [],
+      "acceptanceIds": [
+        "H-01",
+        "H-02",
+        "A-00"
+      ]
+    },
+    {
+      "id": "P1",
+      "name": "Исследование среды и выбор конкретных разрешённых инструментов",
+      "status": "active",
+      "dependsOn": [
+        "P0"
+      ],
+      "acceptanceIds": [
+        "A-06",
+        "A-12"
+      ]
+    },
+    {
+      "id": "P2",
+      "name": "Независимый локальный компонент чтения и сравнения копий",
+      "status": "active",
+      "dependsOn": [
+        "P0"
+      ],
+      "acceptanceIds": [
+        "A-13"
+      ]
+    },
+    {
+      "id": "P2T",
+      "name": "Подготовка пакетов и подтверждённое применение после готовности среды",
+      "status": "not-started",
+      "dependsOn": [
+        "P1",
+        "P2"
+      ],
+      "acceptanceIds": [
+        "A-01",
+        "A-02",
+        "A-03",
+        "A-07",
+        "A-08"
+      ]
+    },
+    {
+      "id": "P3",
+      "name": "Компонентный интерфейс операций по отдельным кнопкам",
+      "status": "not-started",
+      "dependsOn": [
+        "P2T",
+        "P2L"
+      ],
+      "acceptanceIds": [
+        "A-04",
+        "A-10",
+        "A-14",
+        "A-16"
+      ]
+    },
+    {
+      "id": "P4",
+      "name": "Проверка A ↔ B на двух устройствах через согласованный канал",
+      "status": "not-started",
+      "dependsOn": [
+        "P3"
+      ],
+      "acceptanceIds": [
+        "A-05",
+        "A-08",
+        "A-09",
+        "A-11"
+      ]
+    },
+    {
+      "id": "P2L",
+      "name": "Независимая чистая политика лимита выдачи",
+      "status": "complete",
+      "dependsOn": [
+        "P0"
+      ],
+      "acceptanceIds": [
+        "A-15"
+      ]
+    }
+  ],
+  "features": [
+    {
+      "id": "F-01",
+      "name": "Профиль разрешённого проекта и явный выбор файлов",
+      "priority": "mvp",
+      "phaseId": "P2T",
+      "acceptanceIds": [
+        "A-01"
+      ]
+    },
+    {
+      "id": "F-02",
+      "name": "Предпросмотр состава, исключений и размера пакета",
+      "priority": "mvp",
+      "phaseId": "P3",
+      "acceptanceIds": [
+        "A-01",
+        "A-04"
+      ]
+    },
+    {
+      "id": "F-03",
+      "name": "Шифрование готовым проверенным инструментом",
+      "priority": "mvp",
+      "phaseId": "P2T",
+      "acceptanceIds": [
+        "A-02"
+      ]
+    },
+    {
+      "id": "F-04",
+      "name": "Проверка отдельно и выборочное применение к рабочей копии на обоих ноутбуках",
+      "priority": "mvp",
+      "phaseId": "P2T",
+      "acceptanceIds": [
+        "A-03",
+        "A-08"
+      ]
+    },
+    {
+      "id": "F-05",
+      "name": "Прогресс, отмена, понятные ошибки и несекретный отчёт",
+      "priority": "mvp",
+      "phaseId": "P3",
+      "acceptanceIds": [
+        "A-03",
+        "A-04"
+      ]
+    },
+    {
+      "id": "F-06",
+      "name": "Повторный импорт без незаметного дублирования",
+      "priority": "mvp",
+      "phaseId": "P2T",
+      "acceptanceIds": [
+        "A-03",
+        "A-05"
+      ]
+    },
+    {
+      "id": "F-07",
+      "name": "Двусторонний импорт/экспорт по запросу с проверкой общей базы и явными конфликтами",
+      "priority": "mvp",
+      "phaseId": "P2T",
+      "acceptanceIds": [
+        "A-05",
+        "A-07"
+      ]
+    },
+    {
+      "id": "F-08",
+      "name": "Явная Figma-доска статусов без исходников, ключей и зашифрованных пакетов",
+      "priority": "optional",
+      "phaseId": null,
+      "acceptanceIds": [
+        "A-00",
+        "A-04"
+      ]
+    },
+    {
+      "id": "F-09",
+      "name": "Управление получателями, отзыв и ротация ключей",
+      "priority": "later",
+      "phaseId": null,
+      "acceptanceIds": [
+        "A-02"
+      ]
+    },
+    {
+      "id": "F-10",
+      "name": "Сохранение представления файлов и Git diff без шума переноса",
+      "priority": "mvp",
+      "phaseId": "P2T",
+      "acceptanceIds": [
+        "A-08"
+      ]
+    },
+    {
+      "id": "F-11",
+      "name": "Предпросмотр реальных изменений, конфликтов и несовместимых Git-правил",
+      "priority": "mvp",
+      "phaseId": "P3",
+      "acceptanceIds": [
+        "A-04",
+        "A-07",
+        "A-08"
+      ]
+    },
+    {
+      "id": "F-12",
+      "name": "Оптимизация размера пакетов дельтами и автоматический merge",
+      "priority": "later",
+      "phaseId": null,
+      "acceptanceIds": [
+        "A-07",
+        "A-08"
+      ]
+    },
+    {
+      "id": "F-13",
+      "name": "Отдельные кнопки Экспорт и Импорт без фоновой синхронизации",
+      "priority": "mvp",
+      "phaseId": "P3",
+      "acceptanceIds": [
+        "A-04",
+        "A-10"
+      ]
+    },
+    {
+      "id": "F-14",
+      "name": "Figma-плагин — не используется в выбранном первом этапе без плагинов",
+      "priority": "optional",
+      "phaseId": null,
+      "acceptanceIds": [
+        "A-12",
+        "A-05",
+        "A-10"
+      ]
+    },
+    {
+      "id": "F-15",
+      "name": "Локальное сравнение трёх копий без записи",
+      "priority": "mvp",
+      "phaseId": "P2",
+      "acceptanceIds": [
+        "A-13"
+      ]
+    },
+    {
+      "id": "F-16",
+      "name": "Один локальный проект и ручной canvas copy/paste зашифрованного пакета через Figma",
+      "priority": "mvp",
+      "phaseId": "P3",
+      "acceptanceIds": [
+        "A-14",
+        "A-05",
+        "A-10"
+      ]
+    },
+    {
+      "id": "F-17",
+      "name": "Общий лимит 5 МБ/мин с порционной ручной выдачей и countdown",
+      "priority": "mvp",
+      "phaseId": "P3",
+      "acceptanceIds": [
+        "A-15",
+        "A-16",
+        "A-10"
+      ]
+    }
+  ],
+  "pendingDecisions": [
+    {
+      "id": "Q-03",
+      "question": "Любые дополнительные установки уточнять до выполнения. Для независимого readonly компонента нужны только существующий Go при сборке и браузер при запуске; плагины не используются.",
+      "blocks": [
+        "P2T"
+      ]
+    },
+    {
+      "id": "Q-04",
+      "question": "Какие точные версии/архитектуры Windows и Figma Desktop, общая база, Git attributes/config и native checks на обоих ноутбуках? D-12: пользователь планирует последние версии; ориентир zesz измерен по metadata (32 файла, 106745015 байт включая dump; без dump 31 файл/215748 байт). Целевая среда и фактический состав пакета ещё не подтверждены.",
+      "blocks": [
+        "P2T",
+        "P4"
+      ]
+    }
+  ],
+  "transferPolicy": {
+    "maxBytesPerWindow": 5000000,
+    "windowMilliseconds": 60000,
+    "windowBoundary": "(t-60s,t]",
+    "maxPartBytes": 250000,
+    "minIssueIntervalMilliseconds": 3000,
+    "initialCooldownMilliseconds": 3000,
+    "accounting": "serialized-utf8-including-framing-and-reissues",
+    "scope": "one-exclusive-device-owner-all-projects-and-both-directions",
+    "enforcement": "isolated-policy-only-transport-not-connected"
+  }
+}
