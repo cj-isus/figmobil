@@ -1,6 +1,6 @@
 # figmobil
 
-Готовая предварительная сборка Windows x64: [скачать ZIP](https://github.com/cj-isus/figmobil/releases/download/v0.2.0-preview/figmobil-windows-x64-preview.zip). Распакуйте архив и начните с `START-HERE.txt`. Исходники: [cj-isus/figmobil](https://github.com/cj-isus/figmobil).
+Исходники: [cj-isus/figmobil](https://github.com/cj-isus/figmobil) · [скачать исходники ZIP](https://github.com/cj-isus/figmobil/archive/refs/heads/main.zip). Windows-сборка создаётся командой проверки ниже. Публикация готового архива в [Releases](https://github.com/cj-isus/figmobil/releases) пока не завершена; локальный архив находится в `dist/figmobil-windows-x64-preview.zip`.
 
 Локальное Windows-приложение для ручного зашифрованного обмена кодом через текстовый слой Figma **без плагина**. На каждом ноутбуке выбирается один собственный проект; входящие версии и общая база управляются приложением. Диагностическое сравнение локальных папок сохранено в раскрываемом разделе.
 
