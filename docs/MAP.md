@@ -2,13 +2,13 @@
 
 ## Stack
 - Go
-- Commands: check=`node scripts/project/verify.mjs`; test=`go test ./...`; test:harness=`node --test scripts/project/check.test.mjs`; test:ui=`node --test internal/webui/app.test.mjs internal/webui/view-model.test.mjs`; build=`go build -trimpath -o dist/figmobil.exe ./cmd/figmobil`
+- Commands: check=`node scripts/project/verify.mjs`; test=`go test ./...`; test:harness=`node --test scripts/project/check.test.mjs`; test:ui=`node --test internal/webui/app.test.mjs internal/webui/view-model.test.mjs internal/webui/channel.test.mjs internal/webui/channel-model.test.mjs`; build=`go build -trimpath -o dist/figmobil.exe ./cmd/figmobil`
 
 ## ГДЕ ИСКАТЬ (прочитать перед созданием нового)
 - **Компоненты (переиспользовать, не дублировать)**: не найдено — уточни точечным поиском, если задача касается UI
 - **Storybook / stories (каталог UI)**: не найдено — может быть неприменимо к этому проекту
 - **Токены/темы**: не найдено — уточни при работе над UI
-- **Тесты** (10): internal\compare\budget_test.go, internal\compare\compare_test.go, internal\compare\path_test.go, internal\compare\path_windows_test.go, internal\server\integration_test.go, internal\server\server_test.go, internal\transferlimit\gate_test.go, internal\webui\app.test.mjs, internal\webui\view-model.test.mjs, scripts\project\check.test.mjs
+- **Тесты** (20): internal\channel\channel_test.go, internal\compare\budget_test.go, internal\compare\capture_test.go, internal\compare\compare_test.go, internal\compare\drive_windows_test.go, internal\compare\path_test.go, internal\compare\path_windows_test.go, internal\secure\other_test.go, internal\secure\secure_test.go, internal\secure\windows_test.go, internal\server\channel_test.go, internal\server\integration_test.go, …
 - **Backend-каталоги (эвристика)** (2): cmd, internal
 - **Подпроекты по манифестам**: не найдено — вложенные манифесты не найдены
 
@@ -29,10 +29,13 @@ cmd/
   figmobil/
 docs/
 internal/
+  channel/
   compare/
+  secure/
   server/
   transferlimit/
   webui/
+  workspace/
 scripts/
   harness/
   project/

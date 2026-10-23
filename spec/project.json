@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
   "project": "figmobil",
-  "phase": "local-readonly-preview",
+  "phase": "local-manual-channel-development",
   "proposal": "transparent-authorized-package-workflow",
   "implementationApproved": true,
-  "approvalEvidence": "2026-10-20, ответ пользователя на вопрос о прозрачном разрешённом варианте: «Да, принимаю прозрачный вариант». docs/DECISIONS.md D-07. Это согласование назначения и объёма, не канала или установок.",
+  "approvalEvidence": "2026-10-20, ответ пользователя на вопрос о прозрачном разрешённом варианте: «Да, принимаю прозрачный вариант». docs/DECISIONS.md D-07. Это согласование назначения и объёма, не канала или установок. D-16,2026-10-22: согласен после подробного предложения локальной реализации ручного канала с age/DPAPI/подтверждаемым импортом; целевые установки и P4 не закрыты.",
   "environment": {
     "firstPc": {
       "figma": "desktop",
@@ -63,7 +63,7 @@
         "A-12",
         "A-05"
       ],
-      "note": "D-10/D-13: единственный межПК канал Figma; предпочтительный путь без плагина через содержимое текстового слоя на холсте. Локальные comparison roots не являются удалёнными каталогами. Интеграция, криптография и размеры не проверены."
+      "note": "D-10/D-13/D-16: единственный межПК канал Figma, ручное содержимое текстового слоя без плагина. Локальный канал реализован и проверен на синтетических данных; настоящий холст и две целевые машины остаются P4."
     },
     {
       "id": "R-03",
@@ -72,7 +72,7 @@
       "acceptanceIds": [
         "A-02"
       ],
-      "note": "D-14: «шифр не должен легко разгадываться». Текстовое кодирование не даёт конфиденциальности. age остаётся кандидатом; модель аутентификации и первичного доверия не реализована. Криптокод/ключи/новые зависимости не созданы."
+      "note": "D-14/D-16: реализованы age X25519, Ed25519 и DPAPI CurrentUser, привязка ключей/ролей/проекта и сверка кода устройств. Локальные negative/DPAPI tests PASS; реальная сверка двух устройств и независимый публичный checksumDB аудит ещё не завершены. См. docs/STATE.md и internal/secure/DEPENDENCIES.md."
     },
     {
       "id": "R-04",
@@ -175,7 +175,7 @@
         "A-05",
         "A-07"
       ],
-      "note": "D-13. Incoming/base в целевом UI внутренние; current readonly comparator с несколькими локальными корнями лишь диагностический этап. Canvas copy/paste без плагина предпочтителен, но ещё не проверен."
+      "note": "D-13/D-16: основной мастер имеет один localRoot, внутренние incoming/base. Диагностический comparator нескольких локальных папок сохранён отдельно. Настоящий canvas roundtrip остаётся непроверенным."
     },
     {
       "id": "R-15",
@@ -186,7 +186,7 @@
         "A-16",
         "A-10"
       ],
-      "note": "D-15. Pure policy отдельно от будущей single-owner backend/clipboard интеграции. Размер после всего encoding/framing; лимит сетевого трафика самой Figma не обещается."
+      "note": "D-15/D-16: один backend gate и Global device-owner для next/repeat всех профилей и видов сообщений; delayed handoff и restart проверены локально. Реальная выдача через браузер/Figma двух устройств остаётся A-16 planned; трафик самой Figma не регулируется."
     }
   ],
   "acceptance": [
@@ -221,19 +221,22 @@
       "id": "A-01",
       "text": "Предпросмотр показывает ровно выбранные файлы; .git, ключи и секреты исключены; источник не изменяется.",
       "status": "planned",
-      "verification": "Synthetic file fixtures; source tree before/after; exclusion scenarios"
+      "verification": "Synthetic file fixtures; source tree before/after; exclusion scenarios",
+      "evidence": "Partial local evidence: .artifacts/local-verification.json (10/10 PASS), internal/channel/channel_test.go, internal/server/channel_test.go, internal/secure and internal/workspace tests; .artifacts/channel-review.md. Real browser/Figma and both target PCs are not accepted; status remains planned. See docs/STATE.md."
     },
     {
       "id": "A-02",
       "text": "Готовая криптография использует CSPRNG и свежую случайность, восстанавливает пакет только доверенному получателю; полная проверка AEAD и доверенного отправителя завершена до изменения рабочей копии/base. Секреты не выходят в Figma/пакеты/Git/логи; первичное доверие к ключам явно определено.",
       "status": "planned",
-      "verification": "Review supported library/design and authenticated project/package/base/manifest binding; synthetic roundtrip, wrong key/recipient, bit and metadata tampering, truncated/mixed/reordered parts, unauthenticated sender, replay and fresh encryption randomness. Check full-stream verification before working-copy/base changes, bootstrap trust and no secret output. Tests validate integration, not mathematical cryptographic strength."
+      "verification": "Review supported library/design and authenticated project/package/base/manifest binding; synthetic roundtrip, wrong key/recipient, bit and metadata tampering, truncated/mixed/reordered parts, unauthenticated sender, replay and fresh encryption randomness. Check full-stream verification before working-copy/base changes, bootstrap trust and no secret output. Tests validate integration, not mathematical cryptographic strength.",
+      "evidence": "Partial local evidence: .artifacts/local-verification.json (10/10 PASS), internal/channel/channel_test.go, internal/server/channel_test.go, internal/secure and internal/workspace tests; .artifacts/channel-review.md. Real browser/Figma and both target PCs are not accepted; status remains planned. See docs/STATE.md."
     },
     {
       "id": "A-03",
-      "text": "Импорт сначала проверяется отдельно; применение к выбранной рабочей копии пишет только принятые реальные изменения. Неизменённые файлы, локальные правки и index сохраняются; конфликт, гонка, отмена и сбой не оставляют частичного результата.",
+      "text": "Импорт сначала проверяется отдельно; применение пишет только принятые реальные изменения. Неизменённые файлы, локальные правки и index сохраняются; конфликт и гонка блокируют запись. Сбой выявляется, незавершённая запись требует явного восстановления без перезаписи новых правок.",
       "status": "planned",
-      "verification": "Staging plus path traversal, symlink, conflict, pre-apply revalidation, cancellation and interrupted-write fixtures"
+      "verification": "Staging plus path traversal, symlink, conflict, pre-apply revalidation, cancellation and interrupted-write fixtures",
+      "evidence": "Partial local evidence: .artifacts/local-verification.json (10/10 PASS), internal/channel/channel_test.go, internal/server/channel_test.go, internal/secure and internal/workspace tests; .artifacts/channel-review.md. Real browser/Figma and both target PCs are not accepted; status remains planned. See docs/STATE.md."
     },
     {
       "id": "A-04",
@@ -251,13 +254,15 @@
       "id": "A-07",
       "text": "В обоих направлениях проверяются общая базовая версия, несвязанные локальные правки, расходящиеся изменения, отсутствие базы, устаревший и повторный пакет; слепого overwrite и незаметного удаления нет.",
       "status": "planned",
-      "verification": "Common-base, divergent-branch, staged/unstaged changes, conflict, stale/replayed package and explicit deletion scenarios"
+      "verification": "Common-base, divergent-branch, staged/unstaged changes, conflict, stale/replayed package and explicit deletion scenarios",
+      "evidence": "Partial local evidence: .artifacts/local-verification.json (10/10 PASS), internal/channel/channel_test.go, internal/server/channel_test.go, internal/secure and internal/workspace tests; .artifacts/channel-review.md. Real browser/Figma and both target PCs are not accepted; status remains planned. See docs/STATE.md."
     },
     {
       "id": "A-08",
       "text": "Без правок цикл A → B → A не добавляет Git diff; изменение одной строки не меняет остальные. Сохраняются байты нетронутых файлов, EOL/BOM/encoding/EOF и mode; несовместимые Git-политики выявляются до записи.",
       "status": "planned",
-      "verification": "docs/FILE-FIDELITY.md matrix; raw byte, unchanged-file no-write, unmasked Git diff/status before/after and target normalization checks"
+      "verification": "docs/FILE-FIDELITY.md matrix; raw byte, unchanged-file no-write, unmasked Git diff/status before/after and target normalization checks",
+      "evidence": "Partial local evidence: .artifacts/local-verification.json (10/10 PASS), internal/channel/channel_test.go, internal/server/channel_test.go, internal/secure and internal/workspace tests; .artifacts/channel-review.md. Real browser/Figma and both target PCs are not accepted; status remains planned. See docs/STATE.md."
     },
     {
       "id": "A-09",
@@ -269,7 +274,8 @@
       "id": "A-10",
       "text": "На A и B отдельные кнопки Экспорт/Импорт запускают только выбранную операцию. Открытие приложения, правки файлов, таймер, получение пакета и перезапуск ничего не экспортируют/импортируют автоматически; повторный клик не дублирует активную операцию.",
       "status": "planned",
-      "verification": "Button-triggered flows on both devices; idle/startup/file-change/arrival/restart negative cases; no watcher, scheduled polling or automatic resume of writes; duplicate-click guard"
+      "verification": "Button-triggered flows on both devices; idle/startup/file-change/arrival/restart negative cases; no watcher, scheduled polling or automatic resume of writes; duplicate-click guard",
+      "evidence": "Partial local evidence: .artifacts/local-verification.json (10/10 PASS), internal/channel/channel_test.go, internal/server/channel_test.go, internal/secure and internal/workspace tests; .artifacts/channel-review.md. Real browser/Figma and both target PCs are not accepted; status remains planned. See docs/STATE.md."
     },
     {
       "id": "A-11",
@@ -289,26 +295,28 @@
       "text": "Первый локальный компонент явно сравнивает base/local/incoming, не изменяет выбранные каталоги, имеет пределы ресурсов, отмену и защищённый loopback-интерфейс.",
       "status": "planned",
       "verification": "Go scanner/comparison/HTTP tests, Windows build, filesystem/index invariance and real UI scenarios from QUALITY including keyboard/focus/error/loading/cancel/repeat click; source code packaging and transport are not exercised",
-      "evidence": "Partial: .artifacts/local-verification.json (8 groups, 16 UI tests, Go/HTTP metadata budget regressions, Windows exe build); .artifacts/local-path-tests.txt; .artifacts/local-browser-check.json and .artifacts/local-comparison.png (basic flow on previous build only); .artifacts/local-review.md. Full manual UI acceptance remains open after browser URL policy rejected tab reacquisition. No transport or target-device verification."
+      "evidence": "Partial: .artifacts/local-verification.json (10 groups, 32 UI model/controller tests, Go/HTTP/native Windows checks, current exe build). .artifacts/local-browser-check.json and local-comparison.png cover previous comparator only. Full manual UI remains open after browser URL policy rejected reacquisition; no workaround or current browser/Figma/two-device claim."
     },
     {
       "id": "A-14",
       "text": "Ручной путь Export → encrypted text → Figma canvas → copy text contents → Import → preview работает A ↔ B с одним localRoot на каждом ПК. Передача, применение и точное подтверждение общей базы различаются; ручной merge не продвигает базу без подтверждения другой стороны.",
       "status": "planned",
-      "verification": "Synthetic two-device canvas text roundtrip; exact bytes, mixed/missing/replayed parts, wrong project/base, explicit import/export, manual colleague merge and return packet. No remote paths or automatic merge; shared baseline advances only after exact accepted-version acknowledgement."
+      "verification": "Synthetic two-device canvas text roundtrip; exact bytes, mixed/missing/replayed parts, wrong project/base, explicit import/export, manual colleague merge and return packet. No remote paths or automatic merge; shared baseline advances only after exact accepted-version acknowledgement.",
+      "evidence": "Partial local evidence: .artifacts/local-verification.json (10/10 PASS), internal/channel/channel_test.go, internal/server/channel_test.go, internal/secure and internal/workspace tests; .artifacts/channel-review.md. Real browser/Figma and both target PCs are not accepted; status remains planned. See docs/STATE.md."
     },
     {
       "id": "A-15",
       "text": "Чистый потокобезопасный gate допускает готовую часть 1..250000байт не чаще раза в3с с начальным cooldown, не копит burst, отклоняет rollback clock; любое полуоткрытое rolling60s <=5000000байт.",
       "status": "passed",
       "verification": "Deterministic size/UTF8/framing, 3s exact and boundary-1ns, idle no-burst, concurrent caller, backward-clock recovery, sequential owner-start and independent rolling-window byte-sum tests. No network/clipboard/storage/cryptography involved.",
-      "evidence": "internal/transferlimit/gate.go and11 deterministic tests in gate_test.go; .artifacts/local-verification.json: Go package PASS0.737s, all8groups includingvet/build PASS; .artifacts/rate-review.md independent reread accepted. Pure one-owner policy only; transport integration A-16 planned."
+      "evidence": "internal/transferlimit/gate.go and 11 deterministic gate tests; .artifacts/local-verification.json: all 10 groups including Go tests/vet/build PASS; .artifacts/rate-review.md. Pure policy proof is separate from local Manager integration and real canvas A-16 acceptance."
     },
     {
       "id": "A-16",
       "text": "Реальный ручной canvas-путь использует один общий backend gate на устройство во всех проектах/направлениях; текст не выдаётся до разрешения, второй владелец процесса отклонён, старт после ownership выдерживает cooldown, повтор/countdown/отмена не обходят квоту.",
       "status": "planned",
-      "verification": "Future transport integration on two devices with serialized UTF8 accounting including framing/reissues/ACK, parallel windows/projects, process ownership handoff/restart, monotonic clock, cancellation and explicit next-part button. Observe app issuance separately from uncontrolled Figma network traffic and manual pasting of previously obtained text. Check admission immediately before handing off a prepared part, without stockpiled permits or delayed batches; validate delayed handoff/completion ordering separately from admission timestamps."
+      "verification": "Future transport integration on two devices with serialized UTF8 accounting including framing/reissues/ACK, parallel windows/projects, process ownership handoff/restart, monotonic clock, cancellation and explicit next-part button. Observe app issuance separately from uncontrolled Figma network traffic and manual pasting of previously obtained text. Check admission immediately before handing off a prepared part, without stockpiled permits or delayed batches; validate delayed handoff/completion ordering separately from admission timestamps.",
+      "evidence": "Partial local evidence: .artifacts/local-verification.json (10/10 PASS), internal/channel/channel_test.go, internal/server/channel_test.go, internal/secure and internal/workspace tests; .artifacts/channel-review.md. Real browser/Figma and both target PCs are not accepted; status remains planned. See docs/STATE.md."
     }
   ],
   "phases": [
@@ -348,11 +356,10 @@
     },
     {
       "id": "P2T",
-      "name": "Подготовка пакетов и подтверждённое применение после готовности среды",
-      "status": "not-started",
+      "name": "Локальное ядро ручного переноса и синтетические испытания (D-16)",
+      "status": "active",
       "dependsOn": [
-        "P1",
-        "P2"
+        "P0"
       ],
       "acceptanceIds": [
         "A-01",
@@ -365,9 +372,9 @@
     {
       "id": "P3",
       "name": "Компонентный интерфейс операций по отдельным кнопкам",
-      "status": "not-started",
+      "status": "active",
       "dependsOn": [
-        "P2T",
+        "P0",
         "P2L"
       ],
       "acceptanceIds": [
@@ -382,6 +389,9 @@
       "name": "Проверка A ↔ B на двух устройствах через согласованный канал",
       "status": "not-started",
       "dependsOn": [
+        "P1",
+        "P2",
+        "P2T",
         "P3"
       ],
       "acceptanceIds": [
@@ -577,16 +587,15 @@
   "pendingDecisions": [
     {
       "id": "Q-03",
-      "question": "Любые дополнительные установки уточнять до выполнения. Для независимого readonly компонента нужны только существующий Go при сборке и браузер при запуске; плагины не используются.",
+      "question": "D-16 разрешил локальную встроенную age/Ed25519/DPAPI реализацию без дополнительных целевых программ/плагинов. Любая выявленная дополнительная установка на первом ноутбуке уточняется до выполнения.",
       "blocks": [
-        "P2T"
+        "P4"
       ]
     },
     {
       "id": "Q-04",
       "question": "Какие точные версии/архитектуры Windows и Figma Desktop, общая база, Git attributes/config и native checks на обоих ноутбуках? D-12: пользователь планирует последние версии; ориентир zesz измерен по metadata (32 файла, 106745015 байт включая dump; без dump 31 файл/215748 байт). Целевая среда и фактический состав пакета ещё не подтверждены.",
       "blocks": [
-        "P2T",
         "P4"
       ]
     }

@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-10-23",
+  "scope": "Local secure component and pinned public Go module sources only; no target-device installation or real transfer",
+  "toolchain": "go1.26.7 windows/amd64",
+  "checks": [
+    {"command": "go test ./internal/secure -count=1 -v", "status": "pass", "scope": "Nine top-level tests and six rejection subcases, including real ephemeral CurrentUser DPAPI and cross-process device-owner exclusion; no skips"},
+    {"command": "go vet ./internal/secure", "status": "pass"},
+    {"command": "go mod verify", "status": "pass", "scope": "Downloaded module files match the local pinned Go module checksums"},
+    {"check": "Runtime dependency source and license review", "status": "pass", "scope": "Pinned age, hpke, x/crypto and x/sys module-cache source and BSD-3-Clause notices inspected; versions and checksums in DEPENDENCIES.md and repository go.mod/go.sum"},
+    {"check": "Independent authenticated public Go checksum database audit", "status": "incomplete", "reason": "A separate public-only temporary module with process-local GOSUMDB=sum.golang.org reached signed-tree checking, then failed fetching an official checksum tree tile due to TLS timeout; later requests failed because the existing local proxy refused connections. No global setting, certificate validation or network policy was changed."}
+  ],
+  "limitations": [
+    "The host's existing global GOSUMDB=off remains unchanged. Local pin verification is not claimed as independent authenticated checksum-database verification.",
+    "No real Figma copy/paste, target-device environment, two-device handshake, non-Windows runtime or whole-application acceptance is established by these component checks.",
+    "Public-only temporary audit module was retained after a combined cleanup command was rejected by automatic policy; it contains no project source, private key or user data."
+  ]
+}

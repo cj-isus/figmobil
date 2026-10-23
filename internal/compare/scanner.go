@@ -30,30 +30,25 @@ type snapshot struct {
 	blocked  []string
 	warnings []Warning
 	scan     Scan
+	collect  func(string, *Metadata, []byte) error
+	excludes []string
 }
 
 func scanTree(ctx context.Context, path string, budget *scanBudget) (result *snapshot, err error) {
-	if !validRootPath(path) {
-		return nil, fail("INVALID_ROOT", "Нужен абсолютный локальный путь диска; сетевые пути и пространства устройств не поддерживаются.")
-	}
-	info, err := os.Lstat(path)
-	if err != nil || !info.IsDir() || unsupported(info) {
-		return nil, fail("INVALID_ROOT", "Выбранная папка недоступна либо является ссылкой.")
-	}
-	root, err := os.OpenRoot(path)
+	return scanTreeWithOptions(ctx, path, budget, nil, nil)
+}
+
+func scanTreeWithOptions(ctx context.Context, path string, budget *scanBudget, excludes []string, collect func(string, *Metadata, []byte) error) (result *snapshot, err error) {
+	root, err := OpenConfinedRoot(path)
 	if err != nil {
-		return nil, fail("ROOT_UNAVAILABLE", "Не удалось открыть выбранную папку.")
+		return nil, err
 	}
-	tree := &snapshot{root: root, files: map[string]*Metadata{}, dirs: map[string]bool{}, warnings: []Warning{}}
+	tree := &snapshot{root: root, files: map[string]*Metadata{}, dirs: map[string]bool{}, warnings: []Warning{}, excludes: excludes, collect: collect}
 	defer func() {
 		if err != nil {
 			_ = root.Close()
 		}
 	}()
-	opened, err := root.Lstat(".")
-	if err != nil || !sameObservation(info, opened) {
-		return nil, fail("SOURCE_CHANGED", "Папка изменилась при открытии. Повторите сравнение.")
-	}
 	if err = tree.walk(ctx, ".", budget, 0); err != nil {
 		return nil, err
 	}
@@ -62,10 +57,10 @@ func scanTree(ctx context.Context, path string, budget *scanBudget) (result *sna
 
 func excluded(name string, isDir bool) bool {
 	name = strings.ToLower(name)
-	if name == ".git" || name == ".artifacts" || name == "node_modules" || name == "dist" || name == "coverage" {
+	if strings.HasPrefix(name, ".figmobil-") || name == ".git" || name == ".artifacts" || name == "node_modules" || name == "dist" || name == "coverage" {
 		return true
 	}
-	return strings.HasPrefix(name, ".env") || strings.HasSuffix(name, ".pem") || strings.HasSuffix(name, ".pfx") || strings.HasSuffix(name, ".agekey")
+	return strings.HasPrefix(name, ".env") || strings.HasSuffix(name, ".pem") || strings.HasSuffix(name, ".pfx") || strings.HasSuffix(name, ".agekey") || strings.HasSuffix(name, ".fmstate")
 }
 
 func (s *snapshot) walk(ctx context.Context, path string, budget *scanBudget, depth int) error {
@@ -132,7 +127,7 @@ func (s *snapshot) walk(ctx context.Context, path string, budget *scanBudget, de
 		if err != nil {
 			return fail("SOURCE_CHANGED", "Состав папки изменился. Повторите сравнение.")
 		}
-		if excluded(name, info.IsDir()) {
+		if excluded(name, info.IsDir()) || excludedRelative(child, s.excludes) {
 			s.scan.Excluded++
 			if err := budget.appendWarning(&s.warnings, Warning{Code: "PATH_EXCLUDED", Path: filepath.ToSlash(child), Message: "Служебный каталог или потенциальный файл секретов исключён из области сравнения."}); err != nil {
 				return err
@@ -217,6 +212,11 @@ func (s *snapshot) read(ctx context.Context, path string, before os.FileInfo, bu
 	digest := sha256.Sum256(data)
 	metadata := &Metadata{Size: int64(len(data)), SHA256: hex.EncodeToString(digest[:]), Mode: fmt.Sprintf("%04o", before.Mode().Perm())}
 	analyzeRepresentation(data, metadata)
+	if s.collect != nil {
+		if err := s.collect(filepath.ToSlash(path), metadata, data); err != nil {
+			return nil, err
+		}
+	}
 	return metadata, nil
 }
 

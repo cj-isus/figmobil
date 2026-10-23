@@ -4,22 +4,68 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="figmobil-token" content="__FIGMOBIL_TOKEN__">
-  <title>figmobil · Сравнение локальных копий</title>
+  <title>figmobil · Ручной обмен проектом</title>
   <link rel="stylesheet" href="/styles.css">
   <script type="module" src="/app.js"></script>
+  <script type="module" src="/channel.mjs"></script>
 </head>
 <body>
-  <a class="skip-link" href="#main">Перейти к сравнению</a>
+  <a class="skip-link" href="#main">Перейти к проекту</a>
   <header class="topbar">
-    <a class="brand" href="/" aria-label="figmobil, начальная страница"><span class="brand-mark" aria-hidden="true">f</span>figmobil<span class="version">LOCAL COMPARE</span></a>
-    <span class="local-badge"><span aria-hidden="true">●</span> Локально · только чтение</span>
+    <a class="brand" href="/" aria-label="figmobil, начальная страница"><span class="brand-mark" aria-hidden="true">f</span>figmobil<span class="version">MANUAL EXCHANGE</span></a>
+    <span class="local-badge"><span aria-hidden="true">●</span> Локально · по вашей команде</span>
   </header>
   <main id="main" class="workspace">
     <div class="page-heading">
-      <p class="eyebrow">РАБОЧИЕ КОПИИ</p>
-      <h1>Сравнение локальных копий</h1>
-      <p class="intro">Проверьте различия между двумя папками проекта. figmobil читает файлы и показывает отчёт, сохраняя обе копии без изменений.</p>
+      <p class="eyebrow">ПРОЕКТ НА ДВУХ УСТРОЙСТВАХ</p>
+      <h1>Ручной обмен проектом</h1>
+      <p class="intro">На каждом ноутбуке выберите свою папку проекта. Зашифрованный текст переносите через Figma вручную; каждое действие запускается отдельной кнопкой.</p>
     </div>
+    <section id="channel-app" aria-label="Настройка и обмен проектом">
+      <div class="profile-toolbar">
+        <div class="field profile-picker"><label for="channel-profile">Локальные проекты</label><select id="channel-profile"><option value="">Выберите проект</option></select></div>
+        <button type="button" class="button secondary" id="channel-new">Новый проект</button>
+        <button type="button" class="button secondary" id="channel-refresh">Обновить состояние</button>
+      </div>
+      <nav class="wizard-progress" aria-label="Шаги обмена"><ol><li id="channel-step-project">1. Проект</li><li id="channel-step-pair">2. Устройства</li><li id="channel-step-verify">3. Сверка</li><li id="channel-step-exchange">4. Обмен</li></ol></nav>
+      <div id="channel-activity" class="activity" role="status" aria-live="polite" aria-atomic="true">Загружаем список локальных проектов…</div>
+      <div id="channel-error" class="notice error-notice" role="alert" hidden><h2 id="channel-error-heading" tabindex="-1">Действие не завершено</h2><p id="channel-error-message"></p><p id="channel-error-code" class="error-code"></p></div>
+      <div id="channel-running" class="notice channel-running" hidden><p id="channel-running-message"></p><button type="button" class="button secondary small" id="channel-cancel" hidden>Отменить ожидание</button></div>
+      <section class="panel channel-panel" id="channel-setup" aria-labelledby="channel-setup-heading">
+        <div class="section-heading"><span class="step" aria-hidden="true">01</span><div><h2 id="channel-setup-heading" tabindex="-1">Подключите свою копию</h2><p>Путь относится только к этому компьютеру.</p></div></div>
+        <form id="channel-setup-form">
+          <fieldset id="channel-setup-fields"><legend class="sr-only">Локальный проект и подключение устройства</legend>
+            <div class="choice-row"><label class="checkbox-label"><input type="radio" name="channelMode" id="channel-mode-create" value="create" checked>Создать приглашение на первом ноутбуке</label><label class="checkbox-label"><input type="radio" name="channelMode" id="channel-mode-join" value="join">Принять приглашение на втором</label></div>
+            <div class="root-grid"><div class="field"><label for="channel-name">Название проекта</label><input id="channel-name" name="name" required maxlength="100" autocomplete="off" placeholder="Мой проект"></div><div class="field"><label for="channel-device">Название этого устройства</label><input id="channel-device" name="deviceName" required maxlength="80" autocomplete="off" placeholder="Рабочий ноутбук"></div></div>
+            <div class="field channel-root"><label for="channel-root">Папка проекта на этом компьютере</label><input id="channel-root" name="root" required autocomplete="off" spellcheck="false" aria-describedby="channel-root-hint" placeholder="C:\Projects\my-project"><p id="channel-root-hint">Вставьте полный путь из адресной строки Проводника. Папку другого ноутбука здесь указывать не нужно.</p></div>
+            <details class="excludes-details"><summary>Дополнительные исключения</summary><div class="field"><label for="channel-excludes">Относительные пути, по одному на строку</label><textarea id="channel-excludes" name="excludes" rows="3" autocomplete="off" spellcheck="false" placeholder="local-data&#10;large-assets"></textarea><p>Например, local-data. Служебные файлы, ключи и известные секретные имена исключаются дополнительно самим приложением.</p></div></details>
+            <div class="field" id="channel-invite-field" hidden><label for="channel-invite">Приглашение из Figma</label><textarea id="channel-invite" name="text" rows="5" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Вставьте весь текст приглашения"></textarea></div>
+          </fieldset>
+          <div class="channel-actions"><button type="submit" class="button primary" id="channel-create">Создать приглашение</button><p class="input-hint">Приложение не подключается к Figma. Копирование и вставку выполняете вы.</p></div>
+        </form>
+      </section>
+      <section class="panel channel-panel" id="channel-current" aria-labelledby="channel-current-heading" hidden>
+        <div class="channel-current-header"><div><h2 id="channel-current-heading" tabindex="-1"></h2><p id="channel-stage" class="channel-stage"></p></div><span class="local-badge" id="channel-base-state"></span></div>
+        <dl class="profile-description"><dt>Это устройство</dt><dd id="channel-device-value"></dd><dt>Папка проекта</dt><dd id="channel-root-value" class="mono"></dd><dt>Исключения</dt><dd id="channel-excludes-value"></dd></dl>
+        <div class="notice" id="channel-recovery" hidden><h3>Незавершённое применение</h3><p>Запись могла начаться до прерывания. Проверьте восстановление явной кнопкой; обычный обмен временно недоступен.</p><button type="button" class="button secondary" id="channel-recover">Проверить восстановление</button></div>
+        <div class="verification-box" id="channel-verification" hidden><h3>Сверьте код на двух экранах приложения</h3><p>Сравните код непосредственно в figmobil на обоих ноутбуках. Текст в Figma не заменяет эту сверку.</p><p class="verification-code" id="channel-code"></p><p id="channel-confirmation-state"></p><label class="checkbox-label"><input type="checkbox" id="channel-code-matches">Я сравнил оба экрана, коды совпадают</label><button type="button" class="button primary" id="channel-confirm">Подтвердить совпадение</button></div>
+      </section>
+      <div class="channel-exchange-grid" id="channel-exchange" hidden>
+        <section class="panel channel-panel" aria-labelledby="channel-send-heading"><div class="section-heading"><span class="step" aria-hidden="true">↑</span><div><h2 id="channel-send-heading">Экспорт</h2><p>Подготовьте пакет, затем выдавайте текст по частям.</p></div></div>
+          <div class="field"><label for="channel-deletes">Явные удаления, по одному относительному пути</label><textarea id="channel-deletes" rows="2" autocomplete="off" spellcheck="false" aria-describedby="channel-deletes-hint"></textarea><p id="channel-deletes-hint">Необязательно. Отсутствие файла в папке само по себе не считается командой удаления.</p></div>
+          <button type="button" class="button primary" id="channel-export">Подготовить экспорт</button><p class="input-hint" id="channel-export-hint"></p>
+          <div class="outgoing-box" id="channel-outgoing" hidden><p id="channel-outgoing-state"></p><div class="channel-actions"><button type="button" class="button primary" id="channel-next">Выдать следующую часть</button><span id="channel-countdown" class="countdown" aria-live="off"></span></div><div class="repeat-controls"><label for="channel-repeat-number">Повторить выданную часть №</label><input type="number" id="channel-repeat-number" min="1" value="1"><button type="button" class="button secondary small" id="channel-repeat">Выдать повторно</button></div></div>
+          <div class="field outgoing-text" id="channel-output-field" hidden><label for="channel-output">Текст для вставки в Figma</label><textarea id="channel-output" readonly rows="7" spellcheck="false" aria-describedby="channel-output-hint"></textarea><p id="channel-output-hint">Выделите весь текст и нажмите Ctrl+C, затем вставьте в текстовый слой Figma. Переносите части без изменения текста.</p><button type="button" class="button secondary small" id="channel-copy">Скопировать текст</button><p id="channel-copy-status" role="status" aria-live="polite"></p></div>
+          <p class="input-hint">Лимит относится к выдаче текста приложением: до 250 000 байт за часть, не чаще одной части в 3 секунды, до 5 000 000 байт за любые 60 секунд. Ручные повторные вставки и трафик Figma приложение не контролирует.</p>
+        </section>
+        <section class="panel channel-panel" aria-labelledby="channel-receive-heading"><div class="section-heading"><span class="step" aria-hidden="true">↓</span><div><h2 id="channel-receive-heading">Импорт</h2><p>Вставьте ответ, подтверждение или очередную часть.</p></div></div><form id="channel-receive-form"><div class="field"><label for="channel-input">Текст из Figma</label><textarea id="channel-input" name="text" rows="7" required autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Вставьте текст через Ctrl+V"></textarea></div><button type="submit" class="button primary" id="channel-receive">Проверить и добавить текст</button></form><p id="channel-incoming-state" class="input-hint">Входящих частей пока нет.</p><button type="button" class="button secondary" id="channel-preview">Показать изменения</button>
+          <div class="manual-merge" id="channel-manual-merge" hidden><h3>Ручное объединение</h3><p>Объедините изменения обычными инструментами, включая работу с коллегами. Затем отдельно подготовьте текущий результат для обратной отправки.</p><label class="checkbox-label"><input type="checkbox" id="channel-resolve-confirm">Я закончил ручное объединение в своей папке</label><button type="button" class="button secondary" id="channel-resolve">Экспортировать результат объединения</button></div>
+          <details class="discard-details"><summary>Сброс входящего пакета</summary><p class="input-hint">Входящие части и неприменённый пакет будут сброшены. Рабочие файлы, общая база и исходящие сообщения сохраняются.</p><label class="checkbox-label"><input type="checkbox" id="channel-discard-confirm">Подтверждаю сброс входящего пакета</label><button type="button" class="button secondary" id="channel-discard">Сбросить входящий пакет</button></details>
+        </section>
+      </div>
+      <section class="panel channel-panel" id="channel-plan" aria-labelledby="channel-plan-heading" hidden><div class="section-heading"><span class="step" aria-hidden="true">04</span><div><h2 id="channel-plan-heading" tabindex="-1">Предпросмотр применения</h2><p>Проверьте каждый затронутый путь. Изменения выполняются отдельной кнопкой.</p></div></div><div class="table-container"><table><caption class="sr-only">План изменений файлов проекта</caption><thead><tr><th scope="col">Файл</th><th scope="col">Действие</th><th scope="col">Причина</th></tr></thead><tbody id="channel-plan-rows"></tbody></table></div><nav class="pagination" aria-label="Страницы плана"><p id="channel-plan-count"></p><div class="button-group"><button type="button" class="button secondary small" id="channel-plan-prev">← Назад</button><span id="channel-plan-page"></span><button type="button" class="button secondary small" id="channel-plan-next">Далее →</button></div></nav><p id="channel-plan-message" class="input-hint"></p><label class="checkbox-label"><input type="checkbox" id="channel-apply-confirm">Я проверил план и разрешаю изменить перечисленные файлы</label><div class="channel-actions"><button type="button" class="button primary" id="channel-apply">Применить план</button><button type="button" class="button secondary" id="channel-plan-close">Закрыть предпросмотр</button></div><p class="input-hint">После начала применения закрытие страницы не гарантирует отмену записи. Дождитесь результата; после прерывания используйте восстановление.</p></section>
+    </section>
+    <details class="diagnostic-details"><summary>Диагностика: сравнить папки на этом компьютере</summary><p class="input-hint">Отдельный инструмент только читает выбранные локальные папки. Для обычного обмена используйте мастер выше.</p>
     <section class="panel setup-panel" aria-labelledby="setup-heading">
       <div class="section-heading"><span class="step" aria-hidden="true">01</span><div><h2 id="setup-heading">Выберите папки</h2><p>Сравнение начнётся только по кнопке.</p></div></div>
       <form id="compare-form">
@@ -53,7 +99,8 @@
       <nav class="pagination" aria-label="Страницы отчёта"><p id="result-count"></p><div class="button-group"><button class="button small secondary" id="previous-page" type="button">← Назад</button><span id="page-count"></span><button class="button small secondary" id="next-page" type="button">Далее →</button></div></nav>
       <p class="report-footnote">Отсутствие файла во входящей копии не является командой удаления. Сравнение не применяет изменения и не меняет состояние Git.</p>
     </section>
-    <footer class="page-footer"><span>figmobil · локальное сравнение</span><span>Импорт, экспорт и передача через Figma пока не реализованы.</span></footer>
+    </details>
+    <footer class="page-footer"><span>figmobil · ручной обмен · <a href="/licenses.txt" target="_blank" rel="noopener">Лицензии компонентов</a></span><span>Сверяйте устройства перед обменом. В простое передача не запускается.</span></footer>
   </main>
   <noscript><p class="notice">Для локального интерфейса требуется JavaScript. Файлы не изменялись.</p></noscript>
 </body>

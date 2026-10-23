@@ -4,9 +4,9 @@ package compare
 
 import "testing"
 
-func TestOnlyOrdinaryDriveAbsoluteRootsAreAccepted(t *testing.T) {
+func TestOnlyOrdinaryDriveAbsoluteRootSyntaxIsAccepted(t *testing.T) {
 	for _, path := range []string{`C:\`, `D:/project`, `z:\проект\src`, `C:/mixed\separators`} {
-		if !validRootPath(path) {
+		if !validRootSyntax(path) {
 			t.Errorf("ordinary drive path rejected: %q", path)
 		}
 	}

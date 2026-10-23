@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Runs only this application's synthetic checks; never imported project code.
 import { execFileSync } from 'node:child_process';
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { copyFileSync, mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -12,6 +12,8 @@ const checks = [
   { name: 'harness-regressions', command: process.execPath, args: ['--test', 'scripts/project/check.test.mjs'] },
   { name: 'ui-view-model', command: process.execPath, args: ['--test', 'internal/webui/view-model.test.mjs'] },
   { name: 'ui-controller', command: process.execPath, args: ['--test', 'internal/webui/app.test.mjs'] },
+  { name: 'channel-ui-model', command: process.execPath, args: ['--test', 'internal/webui/channel-model.test.mjs'] },
+  { name: 'channel-ui-controller', command: process.execPath, args: ['--test', 'internal/webui/channel.test.mjs'] },
   { name: 'go-format', command: 'gofmt', args: ['-l', 'cmd', 'internal'], emptyOutput: true },
   { name: 'go-tests', command: 'go', args: ['test', './...'] },
   { name: 'go-vet', command: 'go', args: ['vet', './...'] },
@@ -35,6 +37,7 @@ for (const check of checks) {
   }
   console.log(JSON.stringify({ name: check.name, ok: results.at(-1).ok }));
 }
-const report = { ok: results.every(check => check.ok), scope: 'Local read-only component and synthetic fixtures; no Figma or two-device transport verification.', checks: results };
+const report = { ok: results.every(check => check.ok), scope: 'Local manual channel, Windows key/file operations and synthetic fixtures. Browser and real Figma/two-PC transport remain unverified.', checks: results };
+if (report.ok) copyFileSync(resolve(root, 'internal/secure/THIRD-PARTY-NOTICES.txt'), resolve(root, 'dist/THIRD-PARTY-NOTICES.txt'));
 writeFileSync(evidence, `${JSON.stringify(report, null, 2)}\n`);
 process.exitCode = report.ok ? 0 : 1;

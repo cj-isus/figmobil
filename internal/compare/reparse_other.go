@@ -15,3 +15,4 @@ func validRootPath(path string) bool {
 func unsupported(info os.FileInfo) bool {
 	return info == nil || info.Mode()&(os.ModeSymlink|os.ModeIrregular) != 0
 }
+func openCaptureRoot(path string) (*os.Root, error) { return os.OpenRoot(path) }

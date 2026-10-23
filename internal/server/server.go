@@ -15,7 +15,9 @@ import (
 	"strings"
 	"time"
 
+	"figmobil/internal/channel"
 	"figmobil/internal/compare"
+	"figmobil/internal/secure"
 	"figmobil/internal/webui"
 )
 
@@ -38,7 +40,11 @@ type Handler struct {
 	limits    compare.Limits
 	jobs      chan struct{}
 	run       compareFunc
+	channel   *channel.Manager
 }
+
+// EnableChannel is called once before serving requests, after device ownership.
+func (h *Handler) EnableChannel(manager *channel.Manager) { h.channel = manager }
 
 // New requires an explicit IPv4 loopback authority and an unguessable per-run token.
 func New(authority, token string, limits compare.Limits) (*Handler, error) {
@@ -62,7 +68,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Cross-Origin-Resource-Policy", "same-origin")
 	defer func() {
 		if recover() != nil {
-			writeError(w, http.StatusInternalServerError, "INTERNAL_ERROR", "Внутренняя ошибка. Файлы не изменялись.")
+			writeError(w, http.StatusInternalServerError, "INTERNAL_ERROR", "Операция прервана. Обновите состояние и проверьте необходимость восстановления.")
 		}
 	}()
 	if r.Host != h.authority || (r.Header.Get("Origin") != "" && r.Header.Get("Origin") != h.origin) {
@@ -73,12 +79,24 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		h.handleCompare(w, r)
 		return
 	}
+	if r.URL.Path == "/api/channel" {
+		h.handleChannel(w, r)
+		return
+	}
 	if r.Method != http.MethodGet && r.Method != http.MethodHead {
 		w.Header().Set("Allow", "GET, HEAD")
 		writeError(w, http.StatusMethodNotAllowed, "METHOD_NOT_ALLOWED", "Операция недоступна.")
 		return
 	}
-	assets := map[string]string{"/": "index.html", "/app.js": "app.js", "/styles.css": "styles.css", "/view-model.mjs": "view-model.mjs"}
+	if r.URL.Path == "/licenses.txt" {
+		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+		w.Header().Set("Content-Length", strconv.Itoa(len(secure.ThirdPartyNotices)))
+		if r.Method == http.MethodGet {
+			_, _ = io.WriteString(w, secure.ThirdPartyNotices)
+		}
+		return
+	}
+	assets := map[string]string{"/": "index.html", "/app.js": "app.js", "/styles.css": "styles.css", "/view-model.mjs": "view-model.mjs", "/channel.mjs": "channel.mjs", "/channel-model.mjs": "channel-model.mjs"}
 	asset, exists := assets[r.URL.Path]
 	if !exists {
 		writeError(w, http.StatusNotFound, "NOT_FOUND", "Страница не найдена.")

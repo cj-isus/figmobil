@@ -9,3 +9,6 @@ coverage/
 *.agekey
 *.pem
 *.pfx
+*.fmstate
+.figmobil-old-*
+.figmobil-new-*

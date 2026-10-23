@@ -1,15 +1,15 @@
 {
   "name": "figmobil",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
-  "description": "Transparent local read-only project comparison",
+  "description": "Explicit encrypted code-package exchange through Figma text layers",
   "engines": { "node": ">=22.13" },
   "scripts": {
     "check": "node scripts/project/verify.mjs",
     "test": "go test ./...",
     "test:harness": "node --test scripts/project/check.test.mjs",
-    "test:ui": "node --test internal/webui/app.test.mjs internal/webui/view-model.test.mjs",
+    "test:ui": "node --test internal/webui/app.test.mjs internal/webui/view-model.test.mjs internal/webui/channel.test.mjs internal/webui/channel-model.test.mjs",
     "build": "go build -trimpath -o dist/figmobil.exe ./cmd/figmobil"
   }
 }
